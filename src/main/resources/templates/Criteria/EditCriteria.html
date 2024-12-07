@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Criteria</title>
+    <th:block th:insert="common/head :: headContent"></th:block>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/Criteria-List.css}">
+    <link rel="stylesheet" th:href="@{/css/Edit-Criteria.css}">
+    <!-- Chèn Bootstrap CSS từ CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/css/bootstrap.min.css">
+    <!-- Chèn DataTables CSS từ CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <!-- Font Awesome CSS từ CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body class="row g-0">
+<div th:replace="common/header :: headerFragment"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div th:replace="common/sidebar :: sidebarFragement"></div>
+
+        <!-- Content Wrapper -->
+        <div class="col-10" style="margin-top: 1%">
+            <div class="content-wrapper">
+                <!-- Breadcrumb -->
+                <div class="breadcrumb">
+                    <a th:href="@{/criteria-list}">Criteria List</a>
+                    <i class="fa fa-caret-right" style="font-size: larger;margin-left: 1%;margin-right: 1%"></i>
+                    <p>Edit Criteria</p>
+                </div>
+
+                <!-- Group Info -->
+                <div class="group-info">
+                    <div style="display: flex">
+                        <h4>Criteria Info </h4>
+                        <a data-bs-toggle="modal" data-bs-target="#EditCriteriaNameModal" class="edit-action"><i
+                                class="fas fa-pencil-alt" style="margin-left: 10px"></i></a>
+                    </div>
+                    <div class="form-group">
+                        <p>Criteria Name:  <span th:text="${criteria.name}"></span></p>
+                    </div>
+                </div>
+
+                <!-- Ranking Decision List -->
+                <div class="ranking-decision-list">
+                    <div style="display: flex; align-items: center;">
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#addModal" class="btn btn-primary"
+                                style="margin-left: 85%;margin-bottom: 1%">
+                            Add New Option
+                        </button>
+
+                    </div>
+                    <table id="OptionTable" class="display">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Option Name</th>
+                            <th>Score</th>
+                            <th>Explanation</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${optionList}">
+                            <td th:text="${item.getId()}"></td>
+                            <td th:text="${item.getName()}"></td>
+                            <td th:text="${item.getScore()}"></td>
+                            <td th:text="${item.getExplanation()}"></td>
+                            <td class="action-buttons">
+                                <a class="btn btn-sm btn-primary" id="editbutton" data-bs-toggle="modal"
+                                   data-bs-target="#editModal">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <a class="btn btn-danger" id="deleteButton" data-bs-toggle="modal"
+                                   data-bs-target="#deleteModal">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Modal Add New Option-->
+            <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <form th:action="@{/option-list/add-or-update}" method="post">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Add New Option</h5>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="name" class="col-form-label">Option Name:</label>
+                                    <input type="text" class="form-control" id="name" name="name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="score" class="col-form-label">Score:</label>
+                                    <input type="number" min="1" max="10" class="form-control" id="score" name="score">
+                                </div>
+                                <div class="form-group">
+                                    <label for="explanation" class="col-form-label">Description:</label>
+                                    <textarea type="text" class="form-control" id="explanation"
+                                              name="explanation"></textarea>
+                                </div>
+                                <input type="hidden" name="criteria_id" th:value="${criteria.id}">
+                                <input type="hidden" name="id" value=-1>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Edit Option-->
+            <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <form th:action="@{/option-list/add-or-update}" method="post">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="EditOptionModalLabel">Edit Option</h5>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="editname" class="col-form-label">Option Name:</label>
+                                    <input type="text" class="form-control" id="editname" name="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editscore" class="col-form-label">Score:</label>
+                                    <input type="number" min="1" max="10" class="form-control" id="editscore" name="score">
+                                </div>
+                                <div class="form-group">
+                                    <label for="editexplanation" class="col-form-label">Description:</label>
+                                    <textarea type="text" class="form-control" id="editexplanation"
+                                              name="explanation"></textarea>
+                                </div>
+                                <input type="hidden" name="criteria_id" th:value="${criteria.id}">
+                                <input type="hidden" id="editid" name="id" value="">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Delete -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <form th:action="@{/option-list/delete-option}" method="post">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel">Are You Sure Want To Delete This
+                                    Option?</h5>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="deleteName" class="col-form-label">Option Name:</label>
+                                    <input readonly="true" type="text" class="form-control" id="deleteName" name="name">
+                                    <input type="hidden" readonly="true" class="form-control" id="deleteId" name="id" value="">
+                                    <input type="hidden" readonly="true" name="criteria_id" th:value="${criteria.id}">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="saveDeleteButton">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Edit Criteria Name -->
+            <div class="modal fade" id="EditCriteriaNameModal" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <form th:action="@{/criteria-list/edit-criteria/edit-name}" method="post">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="EditCriteriaNameModalLabel">Edit Criteria Name</h5>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="editCriteriaName" class="col-form-label">Criteria Name:</label>
+                                    <input type="text" class="form-control" id="editCriteriaName" name="name"
+                                           th:value="${criteria.name}" required>
+                                    <input type="hidden" class="form-control" id="editCriteriaId" name="id"
+                                           th:value="${criteria.id}">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="saveCriteriaButton">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal for Message -->
+            <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="successModalLabel">New Notification</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p th:text="${message}"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chèn jQuery và Bootstrap JS từ CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/js/bootstrap.bundle.min.js"></script>
+<!-- Chèn DataTables JS từ CDN -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<!-- Font Awesome JS từ CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Kiểm tra xem message có tồn tại hay không
+        var message = [[${message != null}]];
+        if (message === true) {
+            $('#messageModal').modal('show');
+        }
+        $('#OptionTable').DataTable({
+            "pageLength": 5,
+            "searching": false,
+            "lengthChange": false
+        });
+        // Xử lý sự kiện khi click vào nút delete
+        $('#OptionTable').on('click', '.btn-danger[data-bs-target="#deleteModal"]', function () {
+            var row = $(this).closest('tr');
+            var id = row.find('td:first').text(); // Lấy ID của hàng
+            var name = row.find('td:nth-child(2)').text(); // Lấy tên của option
+
+            $('#deleteId').val(id); // Đặt giá trị ID vào input hidden trong modal
+            $('#deleteName').val(name);
+
+        });
+
+        // Xử lý sự kiện khi modal delete được ẩn
+        $('#deleteModal').on('hidden.bs.modal', function () {
+            $('#deleteForm')[0].reset(); // Đặt lại form khi modal bị ẩn
+        });
+
+        // Xử lý sự kiện khi click vào icon bên cạnh Criteria Name
+        $('.icon-button[data-target="#EditCriteriaNameModal"]').click(function () {
+            // Không cần thêm bất kỳ xử lý nào đặc biệt ở đây
+            // Vì data-toggle và data-target đã kích hoạt modal
+        });
+    });
+
+    // Xử lý sự kiện khi click vào nút edit
+    $('#OptionTable').on('click', '.btn-primary[data-bs-target="#editModal"]', function () {
+        var row = $(this).closest('tr');
+        var id = row.find('td:first').text(); // Lấy ID của hàng
+        var name = row.find('td:nth-child(2)').text(); // Lấy tên của option
+        var score = row.find('td:nth-child(3)').text(); // Lấy điểm số của option
+        var explanation = row.find('td:nth-child(4)').text(); // Lấy giải thích của option
+
+        // Đặt giá trị vào các input trong modal edit
+        $('#editid').val(id);
+        $('#editname').val(name);
+        $('#editscore').val(score);
+        $('#editexplanation').val(explanation);
+
+    });
+
+    // Xử lý sự kiện khi modal edit được ẩn
+    $('#editModal').on('hidden.bs.modal', function () {
+        $('#deleteForm')[0].reset(); // Đặt lại form khi modal bị ẩn
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Ranking Group</title>
+    <th:block th:insert="common/head :: headContent"></th:block>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/group-list.css}">
+    <link rel="stylesheet" th:href="@{/css/edit-group.css}">
+    <!-- Chèn Bootstrap CSS từ CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/css/bootstrap.min.css">
+    <!-- Chèn DataTables CSS từ CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <!-- Font Awesome CSS từ CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body class="row g-0">
+<div th:replace="common/header :: headerFragment"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div th:replace="common/sidebar :: sidebarFragement"></div>
+
+        <!-- Content Wrapper -->
+        <div class="col-10" style="margin-top: 1%">
+            <div class="content-wrapper">
+                <!-- Breadcrumb -->
+                <div class="breadcrumb">
+                    <a th:href="@{/group-list}">Ranking Group List</a>
+                    <i class="fa fa-caret-right" style="font-size: larger;margin-left: 1%;margin-right: 1%"></i>
+                    <p>Edit Ranking Group</p>
+                </div>
+
+                <!-- Group Info -->
+                <div class="group-info">
+                    <div style="display: flex">
+                        <h4>Group Info </h4>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#editRankingModal" class="edit-action"><i
+                                class="fas fa-pencil-alt" style="margin-left: 10px"></i></a>
+                    </div>
+                    <div class="form-group">
+                        <p>Group Name</p>
+                        <input type="text" th:value="${groupName}" id="groupName" readonly>
+                        <p>Current Ranking Decision</p>
+                        <input type="text" th:value="${rankingDecisionName}" id="rankingDecisionName" readonly>
+                    </div>
+                </div>
+
+                <!-- Ranking Decision List -->
+                <div class="ranking-decision-list">
+                    <div style="display: flex; align-items: center;">
+                        <h3>Ranking Decision List</h3>
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#addnewModal"
+                                class="btn btn-primary" style="margin-left: 55%;margin-bottom: 1%">
+                            Add New Ranking Decision
+                        </button>
+                        <!-- Dropdown -->
+                        <div class="dropdown" style="margin-left: 10px;">
+                            <i class="fas fa-cog dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;"></i>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" th:href="@{/criteria-list}">Criteria List</a></li>
+                                <li><a class="dropdown-item" th:href="@{/task-list(groupId=${groupID})}">Task List</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <table id="rankingDecisionTable" class="display">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ranking Decision Name</th>
+                            <th>Finalized At</th>
+                            <th>Finalized By</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${RankDecisionList}">
+                            <td th:text="${item.id}"></td>
+                            <td th:text="${item.name}"></td>
+                            <td th:text="${item.finalizedAt != null ? item.finalizedAt : '-'}"></td>
+                            <td th:text="${item.finalizedBy != null ? item.finalizedBy : '-'}"></td>
+                            <td th:text="${item.status ? 'Finalized' : 'Draft'}"></td>
+                            <td class="action-buttons">
+                                <a th:href="@{/ranking-decision-management/criteria-config/{id}(id=${item.id})}" class="edit-action"><i class="fas fa-pencil-alt"></i></a>
+                                <a class="delete-action"
+                                   data-bs-toggle="modal"
+                                   th:data-rankingDecisionId="${item.id}"
+                                   data-bs-target="#deleteModal"
+                                   th:if="${!item.status}"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Modal for editing group -->
+            <div class="modal fade" id="editRankingModal" tabindex="-1" role="dialog"
+                 aria-labelledby="editRankingModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <form th:action="@{/editRanking/updateGroup}" method="post">
+                        <input type="hidden" th:value="${groupID}" name="group_id">
+                        <div class="modal-content" style="width: 116%">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editRankingModalLabel">Edit Ranking Group</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="group-name" class="col-form-label">Group Name:</label>
+                                    <input style="margin-left: -34%" type="text" class="form-control"
+                                           th:value="${groupName}" id="group-name" name="name" required>
+                                    <div class="invalid-feedback" id="group-name-error"></div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1%">
+                                <label for="group-rank" class="col-form-label" style="margin-left: 3%">Ranking
+                                    Decision:</label>
+                                <select style="width: 68%;margin-right: 1%" class="form-control" id="group-rank"
+                                        name="rid" required>
+                                    <option th:each="rank : ${RankDecisionList}" th:if="${rank.status}"
+                                            th:value="${rank.id}" th:text="${rank.name}"></option>
+                                </select>
+                                <div class="invalid-feedback" id="group-rank-error"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Modal add new-->
+            <div class="modal fade" id="addnewModal" tabindex="-1" role="dialog" aria-labelledby="addNewLable"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <form th:action="@{/editRanking/addRankingDecision}" method="post" id="addNewForm">
+                        <input type="hidden" th:value="${groupID}" name="group_id">
+                        <div class="modal-content" style="width: 116%">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="addNewLable" style="margin-left: 30%">Add New Ranking Decision</h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="rank-name" class="col-form-label">Ranking Decision Name:</label>
+                                    <input style="margin-left: -34%" type="text" class="form-control" id="rank-name" name="name" required>
+                                    <div class="invalid-feedback" id="ranking-name-error"></div>
+                                </div>
+                                <div class="form-group form-check" style="margin-left: -4%;margin-top: 3%;margin-bottom: 3%">
+                                    <label class="form-check-label" for="cloneDecision">Clone from other decision</label>
+                                    <label class="switch">
+                                        <input type="checkbox" class="form-check-input" id="cloneDecision" name="cloneDecision">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group" id="chooseDecisionDiv" style="display: none;">
+                                    <label for="choose-decision" class="col-form-label">Choose decision:</label>
+                                    <select style="width: 68%;margin-right: 1%" class="form-control" id="choose-decision" name="chooseDecision">
+                                        <option th:unless="${#lists.size(rankNotGrpup) > 0}" disabled>No Ranking Decision Available</option>
+                                        <option th:each="rank : ${rankNotGrpup}" th:data-name="${rank.name}" th:if="${rank.status}" th:value="${rank.id}" th:text="${rank.name}"></option>
+                                    </select>
+                                    <div class="invalid-feedback" id="choose-decision-error"></div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Add</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+
+            <!-- Modal thông báo thành công -->
+            <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+                 aria-hidden="true" th:if="${successMessage}">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="successModalLabel">Success</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p th:text="${successMessage}"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal thông báo lỗi -->
+            <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel"
+                 aria-hidden="true" th:if="${errorMessage}">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #ff3665">
+                            <h5 class="modal-title" id="errorModalLabel" style="margin-left: 43%">Error</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" style="width: 600px">
+                            <p th:text="${errorMessage}"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Delete -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #ff3665">
+                            <h4 class="modal-title" id="exampleModalLabel">Delete Confirmation</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h5 style="text-align: center">Are you sure want to delete this Ranking Decision?</h5>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                            <a id="delete-btn" style="background-color: #0073e6" class="btn btn-danger">Yes</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <th:block th:insert="common/modal :: commonNotificationModal"></th:block>
+
+        </div>
+    </div>
+</div>
+
+<!-- Chèn jQuery và Bootstrap JS từ CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/js/bootstrap.bundle.min.js"></script>
+<!-- Chèn DataTables JS từ CDN -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<!-- Font Awesome JS từ CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Kiểm tra xem successMessage có tồn tại hay không
+        var successMessage = [[${successMessage != null}]];
+        if (successMessage) {
+            $('#successModal').modal('show');
+        }
+
+        // Kiểm tra xem errorMessage có tồn tại hay không
+        var errorMessage = [[${errorMessage != null}]];
+        if (errorMessage) {
+            $('#errorModal').modal('show');
+        }
+
+        // Initialize DataTable
+        $('#rankingDecisionTable').DataTable({
+            "pageLength":4,
+            "lengthChange": false
+        });
+
+        // Toggle visibility of the choose decision dropdown based on the checkbox state
+        $('#cloneDecision').change(function () {
+            if ($(this).is(':checked')) {
+                $('#chooseDecisionDiv').show();
+                $('#rank-name').removeAttr('required'); // Cho phép ô nhập tên trống khi clone
+                filterUniqueNames(); // Gọi hàm lọc tên duy nhất
+            } else {
+                $('#chooseDecisionDiv').hide();
+                $('#rank-name').attr('required', 'required'); // Yêu cầu nhập tên khi không clone
+            }
+        });
+
+        // Function to filter unique names
+        function filterUniqueNames() {
+            var uniqueNames = new Set();
+            $('#choose-decision option').each(function () {
+                var name = $(this).data('name');
+                if (uniqueNames.has(name)) {
+                    $(this).remove();
+                } else {
+                    uniqueNames.add(name);
+                }
+            });
+        }
+
+        $('.delete-action').click(function () {
+            let rankingDecisionId = $(this).attr('data-rankingDecisionId');
+            $('#delete-btn').click(function (){
+                $.ajax({
+                    url: '/api/ranking-decision-api/'+rankingDecisionId,
+                    method: 'DELETE',
+                    headers: {
+                        [$("meta[name='_csrf_header']").attr("content")]: $("meta[name='_csrf']").attr("content")
+                    },
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // Ensure sending JSON
+                    success: function(response, textStatus, jqXHR) {
+                        $('#notificationSuccessModal .modal-body h5').text(response);
+                        $('#notificationSuccessModal').modal('show');
+                        $('#notificationSuccessModal').on('hidden.bs.modal', function () {
+                            location.reload();
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        $('#notificationErrorModal .modal-body h5').text(jqXHR.responseText);
+                        $('#notificationErrorModal').modal('show');
+                    }
+                });
+            });
+        });
+
+    });
+</script>
+</body>
+</html>

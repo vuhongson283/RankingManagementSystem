@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  server:
+    # "build" mean not use pre-existing image from docker hub but build it from dockerfile
+    build: .
+    restart: always
+    ports:
+    - 8080:8080
+    depends_on:
+      - mysqldb
+  mysqldb:
+    platform: linux/x86_64
+    # use pre-existing image from docker hub
+    image: mysql:8.0.13
+    restart: always
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_DATABASE: ranking_management
+      MYSQL_USER: root
+      MYSQL_PASSWORD: tao0noidauthenhe
+      MYSQL_ROOT_PASSWORD: tao0noidauthenhe

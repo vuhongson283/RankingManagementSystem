@@ -1,0 +1,52 @@
+.sidebar {
+    left: 0;
+    top: 0;
+    color: white;
+    background-color: #34495e; /* Dark background for sidebar */
+    height: 92vh; /* Full height */
+    padding-top: 20px;
+}
+.sidebar a {
+    display: block;
+    padding: 11px;
+    margin-bottom: 10px; /* Thêm khoảng cách giữa các mục */
+    text-decoration: none;
+    color: white;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar a:hover {
+    background-color: white; /* Màu nền khi hover (trắng) */
+    color: #0073e6; /* Màu chữ khi hover (xanh dương) */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Hiệu ứng đổ bóng khi hover */
+}
+.sidebar .logo {
+    display: block;
+    text-align: center;
+    margin-bottom: 20px;
+    color: white;
+    text-decoration: none;
+}
+.sidebar .logo img {
+    width: 120px;
+    margin-bottom: 10px;
+}
+.sidebar .logo h2 {
+    font-family: 'Agency FB';
+    margin: 0;
+}
+
+/* Hover effect for sidebar items */
+.sidebar a {
+    transition: all 0.3s;
+}
+.sidebar a:hover {
+    background-color: #34495e;
+    padding-left: 25px; /* Increase left padding on hover */
+}
+.sidebar a i {
+    margin-right: 10px;
+}
+.sidebar a span {
+    vertical-align: middle;
+}

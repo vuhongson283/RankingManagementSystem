@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Ranking Group</title>
+    <th:block th:insert="common/head :: headContent"></th:block>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/group-list.css}">
+    <link rel="stylesheet" th:href="@{/css/edit-group.css}">
+    <!-- Chèn Bootstrap CSS từ CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/css/bootstrap.min.css">
+    <!-- Chèn DataTables CSS từ CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <!-- Font Awesome CSS từ CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .modal-template .modal-dialog {
+            max-width: 80%; /* Chiều rộng tối đa của modal template */
+            margin: 1.75rem auto; /* Giữ modal ở trung tâm */
+        }
+        .modal-template .modal-content {
+            width: 100%;
+            max-width: none;
+        }
+        .modal-bulk .modal-dialog {
+            max-width: 40%; /* Chiều rộng tối đa của modal bulk */
+            margin: 1.75rem auto; /* Giữ modal ở trung tâm */
+        }
+        .modal-bulk .modal-content {
+            width: 100%;
+            max-width: none;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+        .filter-container {
+            display: flex;
+            align-items: center;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+        }
+        .filter-item label {
+            margin-right: 10px;
+        }
+        .filter-item select {
+            width: 410px; /* Adjust the width as needed */
+            padding: 5px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #000;
+            border-radius: 25px;
+            padding: 5px 10px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        /* Style for the search input */
+        .search-container input[type="search"] {
+            flex-grow: 1;
+            border: none;
+            outline: none;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 25px;
+            width: 100%;
+        }
+        /* Style for the search icon */
+        .search-container i {
+            margin-right: 10px;
+        }
+        /* Hide the default search box */
+        #exportTable_filter {
+            display: none;
+        }
+        .download-imported-file{
+            text-decoration: underline;
+            color: #2ba9e4;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        function toggleCheckboxes(source) {
+            checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i] != source) {
+                    checkboxes[i].checked = source.checked;
+                }
+            }
+        }
+    </script>
+</head>
+<body class="row g-0">
+<div th:replace="common/header :: headerFragment"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div th:replace="common/sidebar :: sidebarFragement"></div>
+        <!-- Content Wrapper -->
+        <div class="col-10" style="margin-top: 1%">
+            <div class="content-wrapper">
+                <!-- Breadcrumb -->
+                <div class="breadcrumb">
+                    <a th:href="@{/group-list}">Ranking Group List</a>
+                    <i class="fa fa-caret-right" style="font-size: larger;margin-left: 1%;margin-right: 1%"></i>
+                    <p>Bulk Ranking History</p>
+                </div>
+                <!-- Group Info -->
+                <div class="group-info">
+                    <div style="display: flex">
+                        <h4>Group Info</h4>
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" id="groupId" th:value="${groupID}" disabled>
+                        <p>Group Name</p>
+                        <input type="text" th:value="${groupName}" readonly>
+                        <p>Current Ranking Decision</p>
+                        <input type="text" th:value="${rankingDecisionName}" readonly>
+                    </div>
+                </div>
+                <!-- Ranking Decision List -->
+                <div class="ranking-decision-list">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <h3>Bulk Ranking History</h3>
+                        <div>
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#exportTemplate"
+                                    class="btn btn-primary" style="margin-right: 10px;">
+                                Export Latest Template
+                            </button>
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#bulkRankingModal" class="btn btn-secondary" style="background-color: #0d6efd; border-color: #0d6efd;">
+                                Bulk Ranking
+                            </button>
+                        </div>
+                    </div>
+                    <table id="rankingDecisionTable" class="display">
+                        <thead>
+                        <tr>
+                            <th>File Name</th>
+                            <th>Ranking Decision</th>
+                            <th>Upload At</th>
+                            <th>Upload By</th>
+                            <th>Status</th>
+                            <th>Note</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${rankingHistoryList}">
+                            <td class="download-imported-file"
+                                   th:data-historyid="${item.id}"
+                                   th:text="${item.fileName}"></td>
+                            <td th:text="${item.rankingDecision}"></td>
+                            <td th:text="${item.uploadedAt}"></td>
+                            <td th:text="${item.uploadedBy}"></td>
+                            <td th:text="${item.status ? 'Success' : 'Failed'}"></td>
+                            <td th:text="${item.note}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Modal bulk ranking -->
+            <div class="modal fade modal-bulk" id="bulkRankingModal" tabindex="-1" role="dialog" aria-labelledby="addNewLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <form enctype="multipart/form-data" id="bulking-ranking-form-data">
+                        <div class="modal-content" style="width: 100%">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="addNewLabel" style="margin-left: 40%">Bulk Ranking</h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="rank-file" class="col-form-label">Select File:</label>
+                                    <input style="margin-left: -50%" type="file" class="form-control" id="rank-file" name="file" accept=".xls,.xlsx" required>
+                                    <div class="invalid-feedback" id="ranking-file-error"></div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" id="upload-bulk-ranking-btn" class="btn btn-primary">Upload</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal template -->
+            <div class="modal fade modal-template" id="exportTemplate" tabindex="-1" role="dialog" aria-labelledby="addNewLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="exportTemplateLabel">Export Template</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="search-container">
+                                <i class="fas fa-search"></i>
+                                <input type="search" id="searchByNameOrId" placeholder="Search by Name or ID">
+                            </div>
+                            <div class="col-md-06 filter-container">
+                                <div style="margin-right: 2%" class="filter-item">
+                                    <label for="rankingDecision">Current Ranking Decision: </label>
+                                    <select id="rankingDecision">
+                                        <option value="">Select Decision</option>
+                                        <option th:each="decision : ${currentRankingDecisionName}" th:value="${decision}" th:text="${decision}"></option>
+
+                                    </select>
+                                </div>
+                                <div class="filter-item">
+                                    <label for="currentRank">Current Rank: </label>
+                                    <select id="currentRank">
+                                        <option value="">Select Rank</option>
+                                        <option th:each="rank : ${currentRank}" th:value="${rank}" th:text="${rank}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="table-container">
+                                <table id="exportTable" class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col"><input type="checkbox" onclick="toggleCheckboxes(this)"></th>
+                                        <th scope="col">Employee ID</th>
+                                        <th scope="col">Employee Name</th>
+                                        <th scope="col">Ranking Group</th>
+                                        <th scope="col">Current Ranking Decision</th>
+                                        <th scope="col">Current Rank</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="history : ${rankingHistory}">
+                                        <td><input type="checkbox" class="employee-checkbox" th:value="${history[0]}"></td>
+                                        <td th:text="${history[0]}"></td>
+                                        <td th:text="${history[1]}" ></td>
+                                        <td th:text="${history[2]}"></td>
+                                        <td th:text="${history[3]}"></td>
+                                        <td th:text="${history[4]}"></td>
+                                    </tr>
+
+                                    <!-- Thêm các hàng dữ liệu khác tương tự -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" id="export-btn" class="btn btn-primary">Export</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Thông báo lỗi  -->
+            <div class="modal fade" id="notificationErrorModal" tabindex="-1" role="dialog" aria-labelledby="existsModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #ff3665">
+                            <h5 class="modal-title" id="existsModalLabel" style="margin-left: 45%">Error</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h5 style="text-align: center;"></h5>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Thông báo thành công  -->
+            <div class="modal fade" id="notificationSuccessModal" tabindex="-1" role="dialog" aria-labelledby="existsModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="successModalLabel" style="margin-left: 45%">Success</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h5 style="text-align: center;"></h5>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chèn jQuery và Bootstrap JS từ CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/js/bootstrap.bundle.min.js"></script>
+<!-- Chèn DataTables JS từ CDN -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<!-- Font Awesome JS từ CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var table = $('#exportTable').DataTable({
+            "pageLength": 5,
+            "searching": true,
+            "lengthChange": false
+        });
+
+        // Di chuyển phần tử tìm kiếm mặc định vào trong search-container
+        $('#exportTable_filter').remove();
+
+        // Thêm sự kiện tìm kiếm tùy chỉnh
+        $('#searchByNameOrId').on('keyup', function () {
+            var searchTerm = this.value.toLowerCase(); // Lấy giá trị tìm kiếm và chuyển sang chữ thường
+            table.rows().every(function () {
+                var data = this.data();
+                var id = data[1].toLowerCase(); // Cột ID (được chuyển sang chữ thường)
+                var name = data[2].toLowerCase(); // Cột tên (được chuyển sang chữ thường)
+
+                // Kiểm tra nếu từ khóa tìm kiếm xuất hiện trong ID hoặc tên
+                if (id.includes(searchTerm) || name.includes(searchTerm)) {
+                    this.nodes().to$().show();
+                } else {
+                    this.nodes().to$().hide();
+                }
+            });
+            table.draw();
+        });
+        $('#rankingDecision, #currentRank').on('change', function () {
+            var selectedDecision = $('#rankingDecision').val().toLowerCase();
+            var selectedRank = $('#currentRank').val().toLowerCase();
+
+            table.rows().every(function () {
+                var data = this.data();
+                var decision = data[4].toLowerCase(); // Cột Current Ranking Decision
+                var rank = data[5].toLowerCase(); // Cột Current Rank
+
+                if ((selectedDecision === "" || decision.includes(selectedDecision)) &&
+                    (selectedRank === "" || rank.includes(selectedRank))) {
+                    this.nodes().to$().show();
+                } else {
+                    this.nodes().to$().hide();
+                }
+            });
+            table.draw();
+        });
+
+    });
+</script>
+<script th:src="@{/js/bulk-ranking/bulk-ranking.js}"></script>
+</body>
+</html>

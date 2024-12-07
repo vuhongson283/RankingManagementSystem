@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <th:block th:insert="common/head :: headContent"></th:block>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/ranking-decision-management/criteria-config.css}">
+</head>
+<body class="row g-0">
+<div th:replace="common/header :: headerFragment"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div th:replace="common/sidebar :: sidebarFragement"></div>
+
+        <div class="col-10 px-4 mt-5 pt-2 main-content">
+            <div class="row px-1 pt-1">
+                <div class="breadcrumb d-flex my-3 mx-3">
+                    <div class="breadcrumb-item ms-1">
+                        <a th:href="@{${'/group-list/edit?id='+rankingDecision.group.id}}">Ranking Decision List</a>
+                    </div>
+                    <i class="fa fa-caret-right" style="font-size: larger;margin-left: 1%;margin-right: 1%"></i>
+                    <div class="breadcrumb-item"><a>Edit Ranking Decision</a></div>
+                </div>
+            </div>
+            <div class="row px-1">
+                <div class="ranking-decision-info-outer mx-2 my-1">
+                    <div class="ranking-decision-info d-flex py-3">
+                        <div class="ranking-decision col-6 my-3 ms-3">
+                            <label for="ranking-decision-name" class="mx-2">Ranking Decision Name</label>
+                            <input type="text" id="ranking-decision-name" class="col-6"
+                                   th:value="${rankingDecision.name}"
+                                   disabled>
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#addModal"
+                                    th:if="${not rankingDecision.status}"><i class="fas fa-pencil-alt fa-lg mx-2"></i>
+                            </button>
+                        </div>
+                        <div class="status col-6 my-3 ms-3">
+                            <label for="ranking-decision-status" class="mx-2">Status</label>
+                            <input type="text" id="ranking-decision-status" class="col-6"
+                                   th:value="${rankingDecision.status ? 'Finalized' : 'Draft'}" disabled>
+                            <button type="button" id="finalize-btn" th:if="${not rankingDecision.status}">Finalize
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="progress-barr d-flex my-3">
+                    <div class="circle" id="criteria-config">
+                        <i class="fa fa-check" aria-hidden="true" th:if="${not rankingDecisionCriterias.isEmpty()}"></i>
+                    </div>
+                    <div class="line"></div>
+                    <div class="circle" id="rank-title-config">
+                        <i class="fa fa-check" aria-hidden="true" th:if="${not rankTitles.isEmpty()}"></i>
+                    </div>
+                    <div class="line"></div>
+                    <div class="circle circle-current" id="task-n-price-config">
+                        <i class="fa fa-check" aria-hidden="true" th:if="${not rankTitleTasks.isEmpty()}"></i>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row align-items-center">
+                <div class="progress-barr d-flex my-3 align-items-center">
+                    <div class="step-name">
+                        Criteria Configuration
+                    </div>
+                    <div class="step-name-space"></div>
+                    <div class="step-name ms-4">
+                        Title Configuration
+                    </div>
+                    <div class="step-name-space"></div>
+                    <div class="step-name">
+                        Task n Price Configuration
+                    </div>
+                </div>
+
+            </div>
+            <div class="row px-1">
+
+                <div class="data-table my-4 mx-4 justify-content-center">
+                    <table class="table table-striped table-bordered border-black my-4 mx-3">
+                        <thead>
+                        <tr>
+                            <th class="border-black">Task</th>
+                            <th class="border-black">Type</th>
+                            <th class="rank-title-col border-black"
+                                th:each="rankTitle : ${rankTitles}"
+                                th:data-ranktitleid="${rankTitle.id}"
+                                th:text="${rankTitle.name}"></th>
+                            <th class="border-black">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th:block th:each="task : ${tasks}">
+                            <tr th:data-taskid="${task.id}">
+                                <td rowspan="2" th:text="${task.name}"></td>
+                                <td>In working hour</td>
+                                <td th:each="rankTitle : ${rankTitles}">
+                                    <th:block th:each="rankTitleTask : ${rankTitleTasks}">
+                                        <input type="number" class="money" min="0"
+                                               th:if="${rankTitleTask.rankTitleTaskId.rankTitle.equals(rankTitle) &&
+                                           rankTitleTask.rankTitleTaskId.task.equals(task)}"
+                                               th:data-taskid="${task.id}"
+                                               th:data-ranktitleid="${rankTitle.id}"
+                                               data-type="in-working-hour"
+                                               th:value="${#numbers.formatDecimal(rankTitleTask.inWorkingHour, 0, 0)}">
+                                    </th:block>
+                                </td>
+                                <td rowspan="2">
+                                    <div class="button-remove"
+                                            th:if="${not rankingDecision.status}"
+                                            th:id="${task.id}">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:data-taskid="${task.id}">
+                                <td>Overtime</td>
+                                <td th:each="rankTitle : ${rankTitles}">
+                                    <th:block th:each="rankTitleTask : ${rankTitleTasks}">
+                                        <input type="number" class="money" min="0"
+                                               th:if="${rankTitleTask.rankTitleTaskId.rankTitle.equals(rankTitle) &&
+                                           rankTitleTask.rankTitleTaskId.task.equals(task)}"
+                                               th:data-taskid="${task.id}"
+                                               th:data-ranktitleid="${rankTitle.id}"
+                                               data-type="overtime"
+                                               th:value="${#numbers.formatDecimal(rankTitleTask.overtime, 0, 0)}">
+                                    </th:block>
+                                </td>
+                            </tr>
+                        </th:block>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="row">
+                <input type="hidden" id="rankingDecisionId" name="rankingDecisionId" th:value="${rankingDecision.id}">
+                <form>
+                    <div class="new-task d-flex align-items-center my-3 mx-3" th:if="${not rankingDecision.status}">
+                        <select name="criteriaId" id="select-new" class="mx-3">
+                            <option value="" id="default-select">Select to add a new Task</option>
+                            <option th:each="task : ${theRestOfTaskList}"
+                                    th:value="${task.id}"
+                                    th:data-name="${task.name}"
+                                    th:text="${task.name}"></option>
+                        </select>
+                        <button type="button" id="button-add-new"><i class="fa fa-plus-circle fa-2x"
+                                                                     aria-hidden="true"></i></button>
+                    </div>
+                </form>
+
+            </div>
+            <div class="row">
+                <div class="cancel-save py-3 px-3">
+                    <button class="cancel" id="button-cancel">Cancel</button>
+                    <button class="save" id="button-save">Save</button>
+                </div>
+            </div>
+
+            <th:block th:insert="common/modal :: commonModal"></th:block>
+        </div>
+    </div>
+</div>
+
+
+<!-- Chèn jQuery và Bootstrap JS từ CDN -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<!-- Chèn DataTables JS từ CDN -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script th:src="@{/js/ranking-decision-management/common.js}"></script>
+<script th:src="@{/js/ranking-decision-management/task-n-price-config.js}"></script>
+</body>
+</html>

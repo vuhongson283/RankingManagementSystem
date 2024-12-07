@@ -1,0 +1,85 @@
+body {
+    overflow: hidden;
+}
+.scrollable-content {
+    margin-left: 270px;
+    overflow-y: scroll;
+    height: 90vh; /* Chiều cao cố định để cho phép cuộn */
+    margin-top: -45%;
+}
+
+.content {
+    margin-left: 15px;
+    margin-top: 20px;
+}
+table {
+    width: 10%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+table, th, td {
+    border: 1px solid black;
+}
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+th {
+    background-color: #2b78e4; /* Màu nền xanh cho hàng tiêu đề */
+    color: white; /* Màu chữ trắng cho hàng tiêu đề */
+}
+
+/* CSS for modal form */
+.modal-header {
+    background-color: #2b78e4;
+    color: white;
+}
+
+.modal-header .close {
+    color: white;
+}
+
+.modal-content {
+    border-radius: 0;
+    border: none;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+}
+
+.form-group label {
+    flex: 1;
+}
+
+.form-group input {
+    flex: 2;
+}
+
+.modal-footer .btn-secondary {
+    background-color: #ff3665;
+    border-color: #ff3665;
+}
+
+.modal-footer .btn-primary {
+    background-color: #2b78e4;
+    border-color: #2b78e4;
+}
+table.dataTable {
+    width: 77%;
+    margin-left: 1%;
+    clear: both;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    margin-right: 25%;
+    float: right;
+    text-align: right;
+    padding-top: .25em;
+}
+.dataTables_length, .dataTables_info {
+    display: none;
+}

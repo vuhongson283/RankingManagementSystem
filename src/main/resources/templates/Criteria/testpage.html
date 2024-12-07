@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Criteria List</title>
+    <th:block th:insert="common/head :: headContent"></th:block>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/group-list.css}">
+    <!-- Chèn Bootstrap CSS từ CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/css/bootstrap.min.css">
+    <!-- Chèn DataTables CSS từ CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <!-- Font Awesome CSS từ CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+</head>
+<body>
+<style>
+
+</style>
+<div th:replace="common/header :: headerFragment"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div th:replace="common/sidebar :: sidebarFragement"></div>
+        <div class="col-10 scrollable-content">
+            <div class="content">
+                <h3 style="font-weight: bolder; margin-bottom: 2%">Criteria List</h3>
+                <table id="CriteriaTable" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Criteria Name</th>
+                        <th>Num Of Option</th>
+                        <th>Maxscore</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="obj : ${objList}">
+                        <td th:text="${obj[0]}"></td>
+                        <td th:text="${obj[2]}"></td>
+                        <td th:text="${obj[1]}"></td>
+                        <td th:text="${obj[2]}"></td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" th:href="@{/criteria-list/edit-criteria/{id}(id=${obj[0]})}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            <a class="btn btn-danger" id="deleteButton" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <!-- Các hàng khác -->
+                    </tbody>
+                </table>
+
+                <!-- Nút để mở modal -->
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" style="margin-top: 2%; margin-bottom: 10%">Add New Criteria</button>
+
+                <!-- Modal Add-->
+                <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <form th:action="@{/criteria-list/add-criteria}" method="post">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="NewCriteriaModalLabel">New Criteria</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="criteria-name" class="col-form-label">Criteria Name:</label>
+                                        <input type="text" class="form-control" id="criteria-name" name="name">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary" id="saveCriteriaButton">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Modal Delete -->
+                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <form th:action="@{/criteria-list/delete-criteria}" method="post">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="DeleteModalLabel">Are You Sure Want To Delete This Criteria?</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="deleteName" class="col-form-label">Option Name:</label>
+                                        <input readonly="true" type="text" class="form-control" id="deleteName" name="name">
+                                        <input type="hidden" class="form-control" id="deleteId" name="id" value="">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary" id="deleteCriteriaButton">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Modal Thông báo -->
+                <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="successModalLabel">New Notification</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p th:text="${message}"></p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chèn jQuery và Bootstrap JS từ CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/js/bootstrap.bundle.min.js"></script>
+<!-- Chèn DataTables JS từ CDN -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<!-- Font Awesome JS từ CDN -->
+<!-- Font Awesome JS từ CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+<!-- Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<!-- JS -->
+<script>
+    $(document).ready(function () {
+        // Kiểm tra xem message có tồn tại hay không
+        var message = [[${message != null}]];
+        if (message === true) {
+            $('#messageModal').modal('show');
+        }
+
+        $('#CriteriaTable').DataTable({
+            "pageLength": 6,
+            "searching": false,
+            "lengthChange": false
+        });
+
+
+        // Xử lý sự kiện khi click vào nút delete
+        $('#CriteriaTable').on('click', '.btn-danger[data-bs-target="#deleteModal"]', function () {
+            var row = $(this).closest('tr');
+            var id = row.find('td:first').text(); // Lấy ID của hàng
+            var name = row.find('td:nth-child(2)').text(); // Lấy tên của option
+
+            $('#deleteId').val(id); // Đặt giá trị ID vào input hidden trong modal
+            $('#deleteName').val(name);
+        });
+
+        // Xử lý sự kiện khi modal delete được ẩn
+        $('#deleteModal').on('hidden.bs.modal', function () {
+            $('#deleteForm')[0].reset(); // Đặt lại form khi modal bị ẩn
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+body {
+    overflow: hidden;
+}
+.scrollable-content {
+    margin-top: 20px;
+    overflow-y: hidden;
+    height: 90vh; /* Fixed height to allow scrolling */
+}
+
+.content {
+    margin-top: 7%;
+    margin-left: 3%;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+
+}
+table, th, td {
+    border: 1px solid black;
+}
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+th {
+    background-color: #2b78e4; /* Blue background for header */
+    color: white; /* White text for header */
+}
+
+/* CSS for modal form */
+.modal-header {
+    background-color: #2b78e4;
+    color: white;
+}
+
+.modal-header .close {
+    color: white;
+}
+
+.modal-content {
+    border-radius: 0;
+    border: none;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+}
+
+.form-group label {
+    flex: 1;
+}
+
+.form-group input {
+    flex: 2;
+}
+
+.modal-footer .btn-secondary {
+    background-color: #ff3665;
+    border-color: #ff3665;
+}
+
+.modal-footer .btn-primary {
+    background-color: #2b78e4;
+    border-color: #2b78e4;
+}
+
+.modal-dialog{
+    margin-top: 10%;
+}
+
+::-webkit-input-placeholder {
+    font-size: 12px; /* Kích cỡ chữ placeholder cho Chrome, Safari, Opera */
+    color: gray;
+}
+:-moz-placeholder {
+    font-size: 12px; /* Kích cỡ chữ placeholder cho Firefox 18- */
+    color: gray;
+}
+::-moz-placeholder {
+    font-size: 12px; /* Kích cỡ chữ placeholder cho Firefox 19+ */
+    color: gray;
+}
+:-ms-input-placeholder {
+    font-size: 12px; /* Kích cỡ chữ placeholder cho Internet Explorer 10+ */
+    color: gray;
+}
+

@@ -1,0 +1,122 @@
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin: 5% 2%;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.breadcrumb a {
+    text-decoration: none;
+    font-size: larger;
+    font-weight: bolder;
+    color: #007bff;
+}
+
+.breadcrumb i {
+    margin: 0 10px;
+    font-size: larger;
+}
+
+.breadcrumb p {
+    font-size: larger;
+    font-weight: bolder;
+    margin: 0;
+}
+
+.group-info {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+}
+
+.group-info h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.form-group p {
+    margin: 0;
+    font-size: larger;
+}
+
+.form-group input {
+    flex: 1;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.ranking-decision-list {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.ranking-decision-list h2 {
+    margin-bottom: 15px;
+}
+
+.ranking-decision-list table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ranking-decision-list th, .ranking-decision-list td {
+    border: 1px solid black;
+    padding: 10px;
+    text-align: left;
+}
+
+.ranking-decision-list th {
+    background-color: white;
+    color: black;
+}
+
+.ranking-decision-list .action-buttons a {
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.ranking-decision-list .action-buttons a.edit-action {
+    color: #ffffff;
+    background-color: #007bff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.ranking-decision-list .action-buttons a.delete-action {
+    color: #ffffff;
+    background-color: #dc3545;
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.ranking-decision-list .action-buttons a.other-action {
+    color: #ffffff;
+    background-color: #ffc107;
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.col-9 {
+    flex: 0 0 auto;
+    width: 80%;
+}
